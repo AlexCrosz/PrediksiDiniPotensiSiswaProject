@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <title>Student Performance - Prediksi Nilai</title>
+    <style>
+        /* Reset and base */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #dcdcdc, #f7f7f7);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 950px;
+            margin: 40px auto;
+            background: #f2f9ff;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+        }
+        /* Left panel with form inputs */
+        .form-panel {
+            flex: 1.1;
+            background: linear-gradient(90deg, #b0b0b0, #eaeaea);
+            padding: 25px 35px;
+            border-radius: 12px;
+            color: #323232;
+            box-shadow: inset 3px 0 8px rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 40px;
+        }
+        .form-panel label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #444;
+        }
+        .form-panel input[type="number"],
+        .form-panel select {
+            padding: 8px 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 15px;
+            outline: none;
+            background: #dbeaf3;
+            color: #222;
+            box-shadow: inset 1px 1px 6px #b0c4d9, inset -1px -1px 6px #f7fbff;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .form-panel input[type="number"]:focus,
+        .form-panel select:focus {
+            background-color: #c6defa;
+        }
+        /* The submit button spans both columns */
+        .form-panel button {
+            grid-column: 1 / -1;
+            padding: 12px 0;
+            background-color: #4e6072;
+            color: #f0f5f9;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+            margin-top: 15px;
+        }
+        .form-panel button:hover {
+            background-color: #374352;
+        }
+
+        /* Right panel with prediction display */
+        .result-panel {
+            flex: 0.8;
+            background-color: #c2d9f9;
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
+            color: #34495e;
+            display: flex;
+            flex-direction: column;
+        }
+        .result-panel h2 {
+            font-weight: 900;
+            font-size: 24px;
+            margin-bottom: 12px;
+            border-bottom: 3px solid #5478a9;
+            padding-bottom: 8px;
+            color: #2c3e50;
+        }
+        .result-panel .grade {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .result-panel .recommendation-box {
+            background: white;
+            flex-grow: 1;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2d3a4a;
+            box-shadow: inset 1px 1px 6px #a9bcd0, inset -1px -1px 6px #f0f6fb;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            min-height: 280px;
+        }
+        /* Error style */
+        .error {
+            color: #c0392b;
+            font-weight: bold;
+            background: #fceae9;
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: inset 1px 1px 6px #e0b4b3, inset -1px -1px 6px #fce9e8;
+        }
+        /* Header style */
+        header {
+            text-align: center;
+            padding-bottom: 15px;
+            font-weight: 900;
+            font-size: 28px;
+            letter-spacing: 1px;
+            color: #567caa;
+        }
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                padding: 20px;
+            }
+            .form-panel, .result-panel {
+                flex: unset;
+                width: 100%;
+                margin-bottom: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Student Performance
+    </header>
+    <div class="container">
+        <form method="post" action="/" class="form-panel">
+            <label for="Age">Usia (15–18 Tahun):</label>
+            <input type="number" id="Age" name="Age" min="15" max="18" step="1" value="{{ form_data.get('Age', '') }}" required />
+
+            <label for="Gender">Jenis Kelamin:</label>
+            <select id="Gender" name="Gender" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('Gender') == '0' %}selected{% endif %}>Laki-laki</option>
+                <option value="1" {% if form_data.get('Gender') == '1' %}selected{% endif %}>Perempuan</option>
+            </select>
+
+            <label for="Ethnicity">Etnis:</label>
+            <select id="Ethnicity" name="Ethnicity" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('Ethnicity') == '0' %}selected{% endif %}>Kaukasia</option>
+                <option value="1" {% if form_data.get('Ethnicity') == '1' %}selected{% endif %}>Afrika Amerika</option>
+                <option value="2" {% if form_data.get('Ethnicity') == '2' %}selected{% endif %}>Asia</option>
+                <option value="3" {% if form_data.get('Ethnicity') == '3' %}selected{% endif %}>Lainnya</option>
+            </select>
+
+            <label for="ParentalEducation">Pendidikan Orang Tua:</label>
+            <select id="ParentalEducation" name="ParentalEducation" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('ParentalEducation') == '0' %}selected{% endif %}>Tidak Sekolah</option>
+                <option value="1" {% if form_data.get('ParentalEducation') == '1' %}selected{% endif %}>Tamat SMA</option>
+                <option value="2" {% if form_data.get('ParentalEducation') == '2' %}selected{% endif %}>Beberapa Tahun Kuliah</option>
+                <option value="3" {% if form_data.get('ParentalEducation') == '3' %}selected{% endif %}>Sarjana</option>
+                <option value="4" {% if form_data.get('ParentalEducation') == '4' %}selected{% endif %}>Lebih Tinggi</option>
+            </select>
+
+            <label for="StudyTimeWeekly">Waktu Belajar Per Minggu (jam):</label>
+            <input type="number" id="StudyTimeWeekly" name="StudyTimeWeekly" min="0" max="1000" step="0.1" value="{{ form_data.get('StudyTimeWeekly', '') }}" required />
+
+            <label for="ParentalSupport">Waktu Bersama Orang Tua:</label>
+            <select id="ParentalSupport" name="ParentalSupport" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('ParentalSupport') == '0' %}selected{% endif %}>Tidak Ada</option>
+                <option value="1" {% if form_data.get('ParentalSupport') == '1' %}selected{% endif %}>Rendah</option>
+                <option value="2" {% if form_data.get('ParentalSupport') == '2' %}selected{% endif %}>Menengah</option>
+                <option value="3" {% if form_data.get('ParentalSupport') == '3' %}selected{% endif %}>Tinggi</option>
+                <option value="4" {% if form_data.get('ParentalSupport') == '4' %}selected{% endif %}>Sangat Tinggi</option>
+            </select>
+
+            <label for="Absences">Jumlah Absen:</label>
+            <input type="number" id="Absences" name="Absences" min="0" max="1000" step="1" value="{{ form_data.get('Absences', '') }}" required />
+
+            <label for="Tutoring">Mengikuti Les/Tutoring:</label>
+            <select id="Tutoring" name="Tutoring" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('Tutoring') == '0' %}selected{% endif %}>Tidak</option>
+                <option value="1" {% if form_data.get('Tutoring') == '1' %}selected{% endif %}>Ya</option>
+            </select>
+
+            <label for="Extracurricular">Mengikuti Ekstrakurikuler:</label>
+            <select id="Extracurricular" name="Extracurricular" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('Extracurricular') == '0' %}selected{% endif %}>Tidak</option>
+                <option value="1" {% if form_data.get('Extracurricular') == '1' %}selected{% endif %}>Ya</option>
+            </select>
+
+            <label for="Sports">Aktivitas Olahraga:</label>
+            <select id="Sports" name="Sports" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('Sports') == '0' %}selected{% endif %}>Tidak</option>
+                <option value="1" {% if form_data.get('Sports') == '1' %}selected{% endif %}>Ya</option>
+            </select>
+
+            <label for="Music">Aktivitas Bermusik:</label>
+            <select id="Music" name="Music" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('Music') == '0' %}selected{% endif %}>Tidak</option>
+                <option value="1" {% if form_data.get('Music') == '1' %}selected{% endif %}>Ya</option>
+            </select>
+
+            <label for="Volunteering">Mengikuti Kegiatan Relawan:</label>
+            <select id="Volunteering" name="Volunteering" required>
+                <option value="">-- Pilih --</option>
+                <option value="0" {% if form_data.get('Volunteering') == '0' %}selected{% endif %}>Tidak</option>
+                <option value="1" {% if form_data.get('Volunteering') == '1' %}selected{% endif %}>Ya</option>
+            </select>
+
+            <button type="submit">PREDIKSI</button>
+        </form>
+
+        <div class="result-panel">
+            <h2>Hasil Prediksi:</h2>
+            {% if prediction %}
+                {% if "Terjadi kesalahan" in prediction %}
+                    <div class="error">{{ prediction }}</div>
+                {% else %}
+                    <div class="grade"><strong>Grade Class :</strong> {{ prediction }}</div>
+                    <div class="recommendation-box">
+                        {{ recommendation }}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="recommendation-box">
+                    Hasil prediksi akan muncul di sini setelah submit.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
